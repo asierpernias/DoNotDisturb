@@ -29,7 +29,6 @@ async function start(){
 
     loop();
 }
-
 async function loop(){
     webcam.update();
 
@@ -39,20 +38,23 @@ async function loop(){
     const best = 
         predictions.reduce((a,b) => a.probability > b.probability ? a : b);
     
-    const percent = Math.round(best.probability *100);
+    const percent = Math.round(best.probability * 100);
 
     document.getElementById("prediction").textContent =
-        `${best.className} - ${percent}%` 
-    
-    document.getElementById("prediction").textContent =
+        `${best.className} - ${percent}%`;
+
+    document.getElementById("confidenceBar").style.width =
         `${percent}%`;
+
     if (best.probability >= safe_time){
         const newMode =
             best.className === HEADPHONES
                 ? "dnd"
                 : "available";
+
         checkStability(newMode);
     }
+
     requestAnimationFrame(loop);
 }
 
