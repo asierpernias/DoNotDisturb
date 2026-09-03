@@ -39,9 +39,13 @@ async function loop(){
     const best = 
         predictions.reduce((a,b) => a.probability > b.probability ? a : b);
     
+    const percent = Math.round(best.probability *100);
+
     document.getElementById("prediction").textContent =
-        `${best.className} - ${Math.round(best.probability * 100)}%` 
-        
+        `${best.className} - ${percent}%` 
+    
+    document.getElementById("prediction").textContent =
+        `${percent}%`;
     if (best.probability >= safe_time){
         const newMode =
             best.className === HEADPHONES
@@ -78,14 +82,17 @@ function changeMode(newMode){
     if (mode === "dnd"){
         modeElement.textContent =
             "Do Not Disturb";
+        
+        addHistory("dnd", "DND activated")
 
-            showNotification(
+        showNotification(
                 "Do Not Disturbe mode activated",
                 "Headphones detected. Notifications will be silenced"
             );
     } else {
         modeElement.textContent = "Available";
 
+        addHistory("available", "DND disabled")
         showNotification(
             "Do Not Disturbe mode deactivated",
             "Headphones removed. Notifications are now allowed."
@@ -104,6 +111,29 @@ function showNotification(title, text){
     setTimeout(() => {
         notification.style.display = "none";
     }, 4000);
+}
+
+function addHistory(type, text){
+    const list = document.getElementById("historyList");
+
+    const item = document.createElement("div");
+
+    const time = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    const icon = type === "dnd" ? "🔕" : "🔔";
+
+    item.className = "history-item";
+
+    item.innerHTML = `
+        <span>${time}</span>
+        <span>${icon}</span>
+        <span>${text}</span>
+    `;
+
+    list.prepend(item)
 }
 
 start();
